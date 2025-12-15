@@ -1,4 +1,5 @@
 #include<iostream>
+#include<ostream>
 #include<string>
 using std::cin;
 using std::cout;
@@ -49,11 +50,17 @@ public:
 	{
 		cout << "HDestructor:\t" << this << endl;
 	}
-	virtual void info()const
+	virtual std::ostream& info(std::ostream& os)const
 	{
-		cout << last_name << " " << first_name << " " << age << endl;
+		return os << last_name << " " << first_name << " " << age << endl;
+	}
+	std::ostream& operator<<(std::ostream& os, const Human& obj)
+	{
+		//return os << obj.get_last_name() << " " << obj.get_first_name() << " " << obj.get_age();
+		return obj.info(os);
 	}
 };
+
 
 class AcademyMember :public Human
 {
@@ -83,10 +90,10 @@ public:
 	}
 
 	//				Methods:
-	void info()const override
+	std::ostream& info(std::ostream& os)const override
 	{
-		Human::info();
-		cout << speciality << endl;
+		Human::info(os);
+		return os << speciality << endl;
 	}
 };
 
@@ -140,10 +147,10 @@ public:
 	}
 
 	//					Methods:
-	void info()const override
+	std::ostream& info(std::ostream& os)const override
 	{
-		AcademyMember::info();
-		cout << group << " " << rating << " " << attendance << endl;
+		AcademyMember::info(os);
+		return os << group << " " << rating << " " << attendance << endl;
 	}
 };
 
@@ -176,10 +183,10 @@ public:
 	}
 
 	//			Methods:
-	void info()const override
+	std::ostream&  info(std::ostream& os)const override
 	{
-		AcademyMember::info();
-		cout << experience << endl;
+		AcademyMember::info(os);
+		return os  << experience << endl;
 	}
 };
 class Graduate :public Student
@@ -210,10 +217,10 @@ public:
 	{
 		cout << "GDestructor:\t" << this << endl;
 	}
-	void info()const override
+	std::ostream& info(std::ostream& os)const override
 	{
-		Student::info();
-		cout << subject << endl;
+		Student::info(os);
+		return os << subject << endl;
 	}
 };
 
@@ -245,9 +252,13 @@ void main()
 		new Student("?????????", "????????", 17, "???", "P_418", 98, 48),
 		new Graduate("??????", "??????", 15, "???", "P_418", 98, 99, "?????? ? ????????? ??????? ?????????? ?? ???????? ????????????? ?????????? (AGI - Artificial General Intelligence)")
 	};
-	for (int i = 0; i < sizeof(group) / sizeof(group[0]); i++)
+    for (int i = 0; i < sizeof(group) / sizeof(group[0]); i++)
 	{
-		group[i]->info();
+		group[i]->info(os);
 		cout << delimiter << endl;
 	}
+	for (int i = 0; i < sizeof(group) / sizeof(group[0]); i++) {
+		delete group[i];
+	}
 }
+
