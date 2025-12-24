@@ -1,5 +1,5 @@
 #include<iostream>
-#include<ostream>
+#include<fstream>
 #include<string>
 using std::cin;
 using std::cout;
@@ -8,12 +8,21 @@ using std::endl;
 #define tab "\t"
 #define delimiter "\n-------------------------------------------------------\n"
 
+
 class Human
 {
+	static const int LAST_NAME_WIDTH = 12;
+	static const int FIRST_NAME_WIDTH = 12;
+	static const int AGE_WIDTH = 3;
+	static int count;
 	std::string last_name;
 	std::string first_name;
 	int age;
 public:
+	static int get_count()
+	{
+		return count;
+	}
 	const std::string& get_last_name()const
 	{
 		return last_name;
@@ -44,26 +53,47 @@ public:
 		set_last_name(last_name);
 		set_first_name(first_name);
 		set_age(age);
+		count++;
 		cout << "HConstructor:\t" << this << endl;
 	}
-	~Human()
+	virtual ~Human()
 	{
 		cout << "HDestructor:\t" << this << endl;
 	}
 	virtual std::ostream& info(std::ostream& os)const
 	{
-		return os << last_name << " " << first_name << " " << age << endl;
+		//return os << last_name << " " << first_name << " " << age;
+		os.width(LAST_NAME_WIDTH);	//задаем ширину вывода, т.е., сколько знакопозиций будет занимать следующее выводимое значение
+		os << std::left;//задаем выравнивание по левому кураю
+		os << last_name;
+		os.width(FIRST_NAME_WIDTH);
+		os << first_name;
+		os.width(AGE_WIDTH);
+		os << age;
+		return os;
 	}
-	std::ostream& operator<<(std::ostream& os, const Human& obj)
+	
+	virtual std::ofstream& write(std::ofstream& ofs)const
 	{
-		//return os << obj.get_last_name() << " " << obj.get_first_name() << " " << obj.get_age();
-		return obj.info(os);
+	ofs << typeid(*this).name() << ":";
+	ofs << last_name << " " << first_name << " " << age;
+	return ofs;
 	}
+	
 };
+std::ostream& operator<<(std::ostream& os, const Human& obj)
+{
+	//os - Output stream
+	return obj.info(os);
+	//obj.info();
+	//return os << obj.get_last_name() << " " << obj.get_first_name() << " " << obj.get_age();
+}
+int Human::count = 0;
 
 
 class AcademyMember :public Human
 {
+	static const int SPECIALITY_WIDTH = 16;
 	std::string speciality;
 public:
 	const std::string& get_speciality()const
@@ -93,12 +123,23 @@ public:
 	std::ostream& info(std::ostream& os)const override
 	{
 		Human::info(os);
-		return os << speciality << endl;
+		os.width(SPECIALITY_WIDTH);
+		os << speciality;
+		return os;
+	}
+	std::ofstream& write(std::ofstream& ofs)const override
+	{
+		Human::write(ofs);
+		ofs << " " << speciality;
+		return ofs;
 	}
 };
 
 class Student :public AcademyMember
 {
+	static const int GROUP_WIDTH = 8;
+	static const int RATING_WIDTH = 8;
+	static const int ATTENDANCE_WIDTH = 8;
 	std::string group;
 	double rating;
 	double attendance;
@@ -150,7 +191,19 @@ public:
 	std::ostream& info(std::ostream& os)const override
 	{
 		AcademyMember::info(os);
-		return os << group << " " << rating << " " << attendance << endl;
+		os.width(GROUP_WIDTH);
+		os << group;
+		os.width(RATING_WIDTH);
+		os << rating;
+		os.width(ATTENDANCE_WIDTH);
+		os << attendance;
+		return os;
+	}
+	std::ofstream& write(std::ofstream& ofs)const override
+	{
+		AcademyMember::write(ofs);
+		ofs << " " << group << " " << rating << " " << attendance;
+		return ofs;
 	}
 };
 
@@ -185,8 +238,14 @@ public:
 	//			Methods:
 	std::ostream&  info(std::ostream& os)const override
 	{
-		AcademyMember::info(os);
-		return os  << experience << endl;
+		return AcademyMember::info(os) << experience;
+
+	}
+	std::ofstream& write(std::ofstream& ofs)const override
+	{
+		AcademyMember::write(ofs);
+		ofs << " " << experience;
+		return ofs;
 	}
 };
 class Graduate :public Student
@@ -222,9 +281,73 @@ public:
 		Student::info(os);
 		return os << subject << endl;
 	}
+	std::ofstream& write(std::ofstream& ofs)
+	{
+		Student::write(ofs);
+		ofs << " " << subject;
+		return ofs;
+	}
 };
+void Print(Human* group[], const int n)
+{
+	for (int i = 0; i < n; i++)
+	{
+		cout << *group[i] << endl;
+	}
+}
+void Save(Human* group[], const int n, const std::string& filename)
+{
+	std::ofstream fout(filename);
+	for (int i = 0; i < n; i++)
+	{
+		fout << *group[i] << endl;
+	}
+	fout.close();
+	std::string cmd = "notepad ";
+	cmd += filename;
+	system("notepad group.txt");
+}
+Human* Factory(const char type[])
+{
+	Human* human = nullptr;
+	if (strstr(type, "Student"))human = new Student("", "", 0, "", "", 0, 0);
+	return
+}
+Human** Load(const std::string& filename, int& n)
+{
+	Human** group = nullptr;
+	std::ifstream fin(filename);
+	if (fin.is_open())
+	{
+		n = 0;
+		std::string buffer;
+		while (!fin.eof())
+		{
+			std::getline(fin, buffer);
+			if (buffer.size() == 0)continue;
+			n++;
+		}
+		cout << n << endl;
+		group = new Human * [n] {};
+		cout << fin.tellg() << endl;
+		fin.clear();
+		fin.seekg(0);
+		cout << fin.tellg();
+		for (int i = 0; !fin.eof(); i++)
+		{
+			//std::getline(fin, buffer, ":");
 
+		}
+	}
+	else
+	{
+		std::cerr << "Error: file not found" << endl;
+	}
+	fin.close();
+	return group;
+}
 //#define INHERITANCE
+//#define POLYMORPHISN
 
 void main()
 {
@@ -237,28 +360,36 @@ void main()
 	AcademyMember albert("Einstein", "Albert", 146, "Astronomy");
 	albert.info();
 
-	Student student("????????", "????", 15, "?????????? ???????????? ???????????", "P_418", 100, 99.9);
+	Student student("Щербаков", "Илья", 15, "Разработка программного обеспечения", "P_418", 100, 99.9);
 	student.info();
 
 	Teacher teacher("Einstein", "Albert", 146, "Astronomy", 120);
 	teacher.info();
 #endif // INHERITANCE
+#ifdef POLYMORPHISN
 	Human* group[] =
 	{
-		new Student("???????????", "???????", 18, "???", "P_418", 97, 98),
+	    new Student("Кондратенко", "Георний", 18, "РПО", "P_418", 97, 98),
 		new Teacher("Stanne", "Michael", 55, "Vocals", 40),
-		new Student("????????", "????", 15, "???", "P_418", 100, 99.9),
+		new Student("Щербаков", "Илья", 15, "РПО", "P_418", 100, 99.9),
 		new Teacher("Henriksson", "Matrin", 50, "Bass", 40),
-		new Student("?????????", "????????", 17, "???", "P_418", 98, 48),
-		new Graduate("??????", "??????", 15, "???", "P_418", 98, 99, "?????? ? ????????? ??????? ?????????? ?? ???????? ????????????? ?????????? (AGI - Artificial General Intelligence)")
+		new Student("Тетевосян", "Элеонора", 17, "РПО", "P_418", 98, 48),
+		new Graduate("Пензин", "Богдан", 15, "РПО", "P_418", 98, 99, "Мнение и этическая позиция подростков на развитие искуственного интеллекта (AGI - Artificial General Intelligence)")
 	};
-    for (int i = 0; i < sizeof(group) / sizeof(group[0]); i++)
+	Print(group, sizeof(group) / sizeof(group[0]));
+
+	std::ofstream fout("group.txt");
+	for (int i = 0; i < sizeof(group) / sizeof(group[i]); i++)
 	{
-		group[i]->info(os);
-		cout << delimiter << endl;
+		fout << *group[i] << endl;
 	}
-	for (int i = 0; i < sizeof(group) / sizeof(group[0]); i++) {
+	fout.close();
+	system("notepad group.txt");
+	for (int i = 0; i < sizeof(group) / sizeof(group[0]); i++)
+	{
 		delete group[i];
 	}
-}
+	cout << "Количество участников группы: " << Human::get_count() << endl;
+#endif // POLYMORPHISN
 
+}
