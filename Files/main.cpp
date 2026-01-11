@@ -32,7 +32,7 @@ void main()
 
 	const int SIZE = 256;
 	char sz_buffer[SIZE] = {};
-	std::ifstream fin("main.cpp");
+	std::ifstream fin("File.txt");
 	if (fin.is_open())
 	{
 		while (!fin.eof())

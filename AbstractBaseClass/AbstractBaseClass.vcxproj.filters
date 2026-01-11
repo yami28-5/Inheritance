@@ -15,6 +15,8 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="201 RAW.txt" />
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
