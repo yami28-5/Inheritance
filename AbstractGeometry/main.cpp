@@ -53,27 +53,29 @@ public:
 	}
 	void set_start_x(int start_x)
 	{
-		if (start_x < MIN_START_X)start_x = MIN_START_X;
-		if (start_x > MAX_START_X)start_x = MAX_START_X;
+		start_x = (start_x < MIN_START_X) ? MIN_START_X :
+			(start_x > MAX_START_X) ? MAX_START_X : start_x;
 		this->start_x = start_x;
 	}
+
 	void set_start_y(int start_y)
 	{
-		if (start_y < MIN_START_Y)start_y = MIN_START_Y;
-		if (start_y > MAX_START_Y)start_y = MAX_START_Y;
+		start_y = (start_y < MIN_START_Y) ? MIN_START_Y :
+			(start_y > MAX_START_Y) ? MAX_START_Y : start_y;
 		this->start_y = start_y;
 	}
+
 	void set_line_width(int line_width)
 	{
-		if (line_width < MIN_LINE_WIDTH)line_width = MIN_LINE_WIDTH;
-		if (line_width > MAX_LINE_WIDTH)line_width = MAX_LINE_WIDTH;
+		line_width = (line_width < MIN_LINE_WIDTH) ? MIN_LINE_WIDTH :
+			(line_width > MAX_LINE_WIDTH) ? MAX_LINE_WIDTH : line_width;
 		this->line_width = line_width;
 	}
+
 	double filter_size(double size)
 	{
-		if (size < 20)size = 20;
-		if (size > 800)size = 500;
-		return size;
+		return (size < 20) ? 20 :
+			(size > 800) ? 500 : size;
 	}
 	Shape(SHAPE_TAKE_PARAMETERS) :color(color)
 	{
